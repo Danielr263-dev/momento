@@ -21,7 +21,10 @@ once that's done, you will be prompted for questions, answer them in the followi
 * src/index.css
 * src/assets/
 5. Replace default App.jsx code with gemini-generated App.jsx code.
-### How the App.jsx code works:
+### Explantion regarding windows-to-linux project working location and why:
+1. Basically, made a copy of the project momento and moved it to linux folder called projects/momento. This was because instead of using wsl and dealing with the bottleneck of moving files from linux to windows, we can work directly with the linux enviornment using linux commands and such.
+2. From here, you can do all commands (linux-wise) as normal, even work with git like normal
+3. Piror to working with this stuff, we opened a remote window running WSL/Ubuntu. 
 
 
   
