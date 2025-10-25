@@ -56,3 +56,5 @@ Logs
 logs/
 *.log
 frontend/package-lock.json
+*.pyc
+__pycache__/
