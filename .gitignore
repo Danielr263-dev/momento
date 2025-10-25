@@ -55,3 +55,4 @@ Logs
 
 logs/
 *.log
+frontend/package-lock.json
