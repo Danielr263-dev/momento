@@ -26,5 +26,8 @@ once that's done, you will be prompted for questions, answer them in the followi
 2. From here, you can do all commands (linux-wise) as normal, even work with git like normal
 3. Piror to working with this stuff, we opened a remote window running WSL/Ubuntu. 
 
+### Running Development Correctly for the windows user (frontend/backend):
+1. The command that runs the backend server is the following: uvicorn app.vision_agent.main:app --reload --host 0.0.0.0 --port 8000
+2. The backend server must be running for backend functionalities to work (like submitting an image and getting results from it).
 
   
