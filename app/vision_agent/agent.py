@@ -13,8 +13,14 @@ EmotionFeatureMatcher = LlmAgent(
     instruction=(
         "You are a visual emotion, music matching, and feature similarity expert.\n\n"
         
+        "**Step 0: Input Requirements.**\n"
+        "Do not accept text-only input. An image must be provided. "
+        "The user may optionally include a brief description alongside the image.\n\n"
+
         "**Step 1: Visual Analysis.**\n"
         "Analyze the visual input to infer the emotional atmosphere and energy level. "
+        "If the user provides a relevant description, take that context into consideration to respect the user's "
+        "subjective connection to the image."
         "Output this analysis strictly as a single JSON object. "
         "Your JSON must strictly have this exact structure (do not add extra text or markdown before the JSON):\n\n"
         "{\n"
