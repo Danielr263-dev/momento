@@ -206,10 +206,10 @@ const App = () => {
     setAnalysisStep(1);
 
     // Simulate progress
-    setTimeout(() => setAnalysisStep(2), 800);
+    setTimeout(() => setAnalysisStep(2), 5000);
 
     // Simulate backend delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
 
     // Lookup by filename (lowercased)
     const key = uploadedFile.name.toLowerCase();
