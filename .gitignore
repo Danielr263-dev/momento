@@ -30,6 +30,10 @@ local environment variables
 .env.local
 .env.*.local
 
+#Ignore virtual enviornment files
+
+.venv/
+
 Vite and other build tools
 
 Compiled output:
