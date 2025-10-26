@@ -180,7 +180,7 @@ const App = () => {
             </button>
           )}
         </div>
-        <p className="text-white/70 text-lg mb-4">Upload an image to discover its unique musical match.</p>
+        <p className="text-white/70 text-lg mb-4">Upload any image to discover its best musical counterpart</p>
 
         {isProcessing && <ProgressBar step={analysisStep} />}
 
@@ -268,8 +268,8 @@ const App = () => {
             {isProcessing
               ? "Analyzing..."
               : results
-              ? "Find Another Match"
-              : "Find the Music Match"}
+              ? "Find another match"
+              : "Find the musical match"}
           </button>
         </div>
 
