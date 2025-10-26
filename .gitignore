@@ -30,6 +30,10 @@ local environment variables
 .env.local
 .env.*.local
 
+#Ignore virtual enviornment files
+
+.venv/
+
 Vite and other build tools
 
 Compiled output:
@@ -56,3 +60,5 @@ Logs
 logs/
 *.log
 frontend/package-lock.json
+*.pyc
+__pycache__/
