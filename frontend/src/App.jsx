@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
+import CustomAudioPlayer from "./CustomAudioPlayer"; // adjust the path as needed
 
-// --- Progress Bar Component ---
 const ProgressBar = ({ step }) => {
   const segmentClass = (segment) => {
     let classes = "h-2 rounded-full transition-all duration-700 ease-out ";
@@ -35,13 +35,6 @@ const App = () => {
   const fileInputRef = useRef(null);
   const MAX_FILE_SIZE = 4 * 1024 * 1024;
 
-  const FeatureItem = ({ name, value }) => (
-    <div className="flex justify-between mb-1 text-xs text-gray-400">
-      <span className="font-medium">{name}:</span>
-      <span className="font-bold">{value.toFixed(2)}</span>
-    </div>
-  );
-
   const resetUI = useCallback(() => {
     setUploadedFile(null);
     setIsProcessing(false);
@@ -57,8 +50,8 @@ const App = () => {
     if (!file.type.startsWith("image/") || file.size > MAX_FILE_SIZE) {
       alert(
         file.size > MAX_FILE_SIZE
-          ? "❌ File too large (max 4MB)."
-          : "🚫 Please select an image file."
+          ? "File too large (max 4MB)."
+          : "Please select an image file."
       );
       return;
     }
@@ -98,7 +91,113 @@ const App = () => {
     e.currentTarget.classList.remove("border-opacity-100", "border-purple-300");
   }, []);
 
-  // --- NEW: Call backend instead of fake processing ---
+  // Dictionary of dummy data
+  const dummyDataset = {
+    "car.jpg": {
+      analysis: {
+        mood: "Dynamic",
+        target_features: {
+          danceability: 0.7,
+          energy: 0.9,
+          valence: 0.8,
+          acousticness: 0.2,
+          tempo: 130,
+        },
+      },
+      match: {
+        name: "Sights",
+        artist: "Attom",
+        distance: 0.96,
+        preview_url: "https://p.scdn.co/mp3-preview/fake-url-car.mp3",
+        album_art: "/images/sights.jpeg",
+        reasoning: "The image, featuring a sleek car in motion on a highway at night" + 
+        " against a backdrop of city lights, conveys a strong sense of speed, modernity," +
+        " and urban energy. The motion blur and bright headlights emphasize movement and a" +
+        " dynamic atmosphere. This leads to the \"Dynamic\" mood, characterized by high energy" +
+        " and valence, moderate danceability, a lower acousticness reflecting the urban setting," + 
+        " and an upbeat tempo suitable for driving through the city. The instrumentalness is also" +
+        " moderately high, suggesting a focus on the journey's feel rather than prominent vocals.",
+      },
+    },
+    "nature.jpg": {
+      analysis: {
+        mood: "Peaceful",
+        target_features: {
+          danceability: 0.2,
+          energy: 0.3,
+          valence: 0.8,
+          acousticness: 0.9,
+          tempo: 70,
+        },
+      },
+      match: {
+        name: "Within Our Midst",
+        artist: "Simon Wester",
+        distance: 0.88,
+        preview_url: "https://p.scdn.co/mp3-preview/fake-url-beach.mp3",
+        album_art: "/images/midst.jpg",
+        reasoning: "The image depicts a serene forest path bathed in natural" + 
+        " light, with lush green and golden foliage. This scene strongly suggests" + 
+        " a \"Peaceful\" mood, characterized by a high sense of calm and positivity." + 
+        " The features reflect this with high valence and acousticness, low energy and" + 
+        " danceability, and high instrumentalness, indicating a preference for gentle," + 
+        " organic, and contemplative sounds, all at a slow, unhurried tempo.",
+      },
+    },
+    "stormy.jpg": {
+      analysis: {
+        mood: "Melancholic",
+        target_features: {
+          danceability: 0.2,
+          energy: 0.4,
+          valence: 0.3,
+          acousticness: 0.6,
+          tempo: 80,
+        },
+      },
+      match: {
+        name: "Evenfall",
+        artist: "Jacob LaVallee",
+        distance: 0.84,
+        preview_url: "https://p.scdn.co/mp3-preview/fake-url-beach.mp3",
+        album_art: "/images/evenfall.jpeg",
+        reasoning: "Considering your feeling of \"melancholic,\" the stormy" + 
+        " city night scene, with its dark hues, reflections, and distant" + 
+        " lightning, evokes a sense of contemplative sadness rather than" +
+        " outright intensity. The lower valence and energy reflect this" +
+        " subdued emotional state, while moderate acousticness and high" + 
+        " instrumentalness suggest a preference for reflective, possibly" + 
+        " piano-driven or orchestral pieces that allow for introspection." + 
+        " The slower tempo reinforces the melancholic and unhurried mood.",
+      },
+    },
+    "two-dogs.jpg": {
+      analysis: {
+        mood: "Joyful",
+        target_features: {
+          danceability: 0.6,
+          energy: 0.8,
+          valence: 0.3,
+          acousticness: 0.6,
+          tempo: 120,
+        },
+      },
+      match: {
+        name: "Joyful Joyful",
+        artist: "Lil Paul",
+        distance: 0.97,
+        preview_url: "https://p.scdn.co/mp3-preview/fake-url-beach.mp3",
+        album_art: "/images/joyful.jpg",
+        reasoning: "The image features two golden retriever puppies" +
+        " looking happy and playful in a natural, outdoor setting," + 
+        " which evokes a strong sense of joy. The estimated audio" +
+        " features reflect this by having high valence (happiness)," +
+        " moderate energy and danceability, and high acousticness to" + 
+        " match the outdoor environment.",
+      },
+    },
+  };
+
   const processImageForMatch = useCallback(async () => {
     if (!uploadedFile || isProcessing) return;
 
@@ -106,28 +205,39 @@ const App = () => {
     setResults(null);
     setAnalysisStep(1);
 
-    const formData = new FormData();
-    formData.append("file", uploadedFile.file);
+    // Simulate progress
+    setTimeout(() => setAnalysisStep(2), 800);
 
-    try {
-      const res = await fetch("http://127.0.0.1:8000/analyze-image", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
+    // Simulate backend delay
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      if (data.success) {
-        setResults(data.data);
-        setAnalysisStep(3);
-      } else {
-        alert("Error: " + data.error);
-      }
-    } catch (err) {
-      alert("Network error: " + err.message);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [uploadedFile, isProcessing]);
+    // Lookup by filename (lowercased)
+    const key = uploadedFile.name.toLowerCase();
+    const data = dummyDataset[key] || {
+      analysis: {
+        mood: "Default Mood",
+        target_features: {
+          danceability: 0.48,
+          energy: 0.37,
+          valence: 0.62,
+          acousticness: 0.81,
+          tempo: 92.5,
+        },
+      },
+      match: {
+        name: "untitled",
+        artist: " ",
+        distance: 0.0,
+        preview_url: "https://p.scdn.co/mp3-preview/fake-url-default.mp3",
+        album_art: null,
+        reasoning: "No matching for specified image",
+      },
+    };
+
+    setResults(data);
+    setAnalysisStep(3);
+    setIsProcessing(false);
+  }, [uploadedFile, isProcessing, dummyDataset]);
 
   const dropZoneClasses = `flex flex-col items-center justify-center border-2 border-dashed rounded-xl h-48 text-center cursor-pointer transition-colors duration-200 
     ${uploadedFile ? "hidden" : "border-purple-600 text-purple-200 hover:border-purple-300 hover:text-purple-100 hover:bg-purple-800/20"}`;
@@ -188,9 +298,7 @@ const App = () => {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <p className="mt-2 text-base font-medium">
-              Drag & drop your image here
-            </p>
+            <p className="mt-2 text-base font-medium">Drag & drop your image here</p>
             <p className="text-xs text-purple-300/70">
               or click to select file (PNG, JPG, up to 4MB)
             </p>
@@ -213,10 +321,7 @@ const App = () => {
                 />
                 {isProcessing && (
                   <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                    <svg
-                      className="animate-spin h-8 w-8 text-white"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className="animate-spin h-8 w-8 text-white" viewBox="0 0 24 24">
                       <circle
                         className="opacity-25"
                         cx="12"
@@ -258,51 +363,26 @@ const App = () => {
         {results && (
           <div className="mt-8 w-full text-left">
             <h3 className="text-xl font-bold text-white mb-4 text-center">
-              🎶 Musical Match
+              🎶 Matched Song
             </h3>
 
-            <div className="mb-6 p-4 bg-purple-900/40 rounded-xl border border-purple-700 shadow-inner">
-              <p className="font-semibold text-gray-200 mb-2">Image Analysis:</p>
-              <p className="text-2xl font-extrabold text-purple-300">
-                Mood: {results.analysis.mood}
-              </p>
+            {results.match.preview_url && (
+              <CustomAudioPlayer
+                src={results.match.preview_url}
+                albumArt={results.match.album_art}
+                title={results.match.name}
+                artist={results.match.artist}
+              />
+            )}
 
-              <h4 className="mt-4 text-sm font-bold text-gray-300">
-                Target Acoustic Profile:
-              </h4>
-              <div className="grid grid-cols-2 gap-x-4">
-                {Object.entries(results.analysis.target_features).map(
-                  ([key, value]) => (
-                    <FeatureItem
-                      key={key}
-                      name={key.charAt(0).toUpperCase() + key.slice(1)}
-                      value={value}
-                    />
-                  )
-                )}
+            {results.match.reasoning && (
+              <div className="mt-6 w-full text-center">
+                <h3 className="text-xl font-bold text-white mb-4">🧠 Reasoning</h3>
+                <div className="p-4 bg-purple-900/40 rounded-xl border border-purple-700 text-gray-300 shadow-inner">
+                  <p className="text-sm">{results.match.reasoning}</p>
+                </div>
               </div>
-            </div>
-
-            <div className="p-4 bg-purple-900/60 rounded-xl border border-purple-500 shadow-xl">
-              <p className="font-semibold text-gray-100 mb-2">Final Match:</p>
-              <p className="text-2xl font-extrabold text-green-400">
-                {results.match.name}
-              </p>
-              <p className="text-lg text-gray-200 mt-1">{results.match.artist}</p>
-              <p className="text-sm text-gray-400 mt-2">
-                Match Quality: {results.match.distance.toFixed(4)}
-              </p>
-
-              {results.match.preview_url && (
-                <audio
-                  controls
-                  className="w-full mt-4 rounded-lg shadow-md bg-purple-700"
-                >
-                  <source src={results.match.preview_url} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              )}
-            </div>
+            )}
           </div>
         )}
       </div>

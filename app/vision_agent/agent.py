@@ -48,6 +48,8 @@ EmotionFeatureMatcher = LlmAgent(
         "**Step 4: Final Output.**\n"
         "Combine your original JSON (from Step 1) with a markdown section labeled `## Suggested Tracks:` "
         "followed by a short list of the top three matching tracks in the format:\n"
+        "Also, output a markdown section labeled `## Reasoning: `"
+        "followed by a short reasoning for why you chose this label"
         "`Track Name` by `Artist` (Similarity: X.XX)\n\n"
         "If any tool call fails, report the error clearly after the JSON."
     ),
