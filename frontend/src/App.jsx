@@ -4,11 +4,9 @@ import React, { useState, useCallback, useRef } from "react";
 const ProgressBar = ({ step }) => {
   const segmentClass = (segment) => {
     let classes = "h-2 rounded-full transition-all duration-700 ease-out ";
-    if (step >= segment) {
-      classes += "bg-green-400 shadow-md shadow-green-600/30";
-    } else {
-      classes += "bg-gray-700/50";
-    }
+    classes += step >= segment
+      ? "bg-green-400 shadow-md shadow-green-600/30"
+      : "bg-gray-700/50";
     return classes;
   };
 
@@ -53,7 +51,7 @@ const App = () => {
   }, []);
 
   const handleFiles = useCallback((files) => {
-    if (files.length === 0) return;
+    if (!files.length) return;
     const file = files[0];
 
     if (!file.type.startsWith("image/") || file.size > MAX_FILE_SIZE) {
@@ -85,10 +83,7 @@ const App = () => {
   const handleDrop = useCallback(
     (e) => {
       preventDefaults(e);
-      e.currentTarget.classList.remove(
-        "border-opacity-100",
-        "border-purple-300"
-      );
+      e.currentTarget.classList.remove("border-opacity-100", "border-purple-300");
       handleFiles(e.dataTransfer.files);
     },
     [handleFiles]
@@ -101,13 +96,9 @@ const App = () => {
 
   const handleDragLeave = useCallback((e) => {
     preventDefaults(e);
-    e.currentTarget.classList.remove(
-      "border-opacity-100",
-      "border-purple-300"
-    );
+    e.currentTarget.classList.remove("border-opacity-100", "border-purple-300");
   }, []);
 
-  // simplified fake processing just for progress animation
   const processImageForMatch = useCallback(() => {
     if (!uploadedFile || isProcessing) return;
     setIsProcessing(true);
@@ -146,25 +137,14 @@ const App = () => {
   }, [uploadedFile, isProcessing]);
 
   const dropZoneClasses = `flex flex-col items-center justify-center border-2 border-dashed rounded-xl h-48 text-center cursor-pointer transition-colors duration-200 
-  ${
-    uploadedFile
-      ? "hidden"
-      : "border-purple-600 text-purple-200 hover:border-purple-300 hover:text-purple-100 hover:bg-purple-800/20"
-  }`;
+    ${uploadedFile ? "hidden" : "border-purple-600 text-purple-200 hover:border-purple-300 hover:text-purple-100 hover:bg-purple-800/20"}`;
 
   const buttonStyle = isProcessing
     ? "bg-gray-700 text-gray-400 cursor-not-allowed"
     : "bg-purple-600 shadow-lg shadow-purple-900/50 hover:bg-purple-700";
 
   return (
-    <div
-      className="flex items-center justify-center min-h-screen p-4 font-sans"
-      // ⬇️ Background gradient is defined here
-      style={{
-        background:
-          "radial-gradient(circle at center, #5A2AAC 0%, #3E1C7E 40%, #1E0A3B 100%)",
-      }}
-    >
+    <div className="flex items-center justify-center min-h-screen p-4 font-sans bg-gradient-radial">
       <div className="bg-[#2c1f4d]/80 backdrop-blur-sm rounded-2xl p-8 max-w-xl w-full shadow-[0_0_50px_rgba(150,0,255,0.2)] border border-purple-800/50 flex flex-col items-center text-center">
         {/* Header */}
         <div className="flex items-center justify-between w-full mb-6">
@@ -180,7 +160,9 @@ const App = () => {
             </button>
           )}
         </div>
-        <p className="text-white/70 text-lg mb-4">Upload any image to discover its best musical counterpart</p>
+        <p className="text-white/70 text-lg mb-4">
+          Upload any image to discover its best musical counterpart
+        </p>
 
         {isProcessing && <ProgressBar step={analysisStep} />}
 
@@ -309,9 +291,7 @@ const App = () => {
               <p className="text-2xl font-extrabold text-green-400">
                 {results.match.name}
               </p>
-              <p className="text-lg text-gray-200 mt-1">
-                {results.match.artist}
-              </p>
+              <p className="text-lg text-gray-200 mt-1">{results.match.artist}</p>
               <p className="text-sm text-gray-400 mt-2">
                 Match Quality: {results.match.distance.toFixed(4)}
               </p>
@@ -321,10 +301,7 @@ const App = () => {
                   controls
                   className="w-full mt-4 rounded-lg shadow-md bg-purple-700"
                 >
-                  <source
-                    src={results.match.preview_url}
-                    type="audio/mpeg"
-                  />
+                  <source src={results.match.preview_url} type="audio/mpeg" />
                   Your browser does not support the audio element.
                 </audio>
               )}
