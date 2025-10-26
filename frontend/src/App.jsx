@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
 
-// --- Progress Bar Component (kept for animation while processing) ---
+// --- Progress Bar Component ---
 const ProgressBar = ({ step }) => {
   const segmentClass = (segment) => {
     let classes = "h-2 rounded-full transition-all duration-700 ease-out ";
@@ -69,7 +69,6 @@ const App = () => {
         file,
         name: file.name,
         previewUrl: e.target.result,
-        base64Data: e.target.result.split(",")[1],
       });
     };
     reader.readAsDataURL(file);
@@ -99,41 +98,35 @@ const App = () => {
     e.currentTarget.classList.remove("border-opacity-100", "border-purple-300");
   }, []);
 
-  const processImageForMatch = useCallback(() => {
+  // --- NEW: Call backend instead of fake processing ---
+  const processImageForMatch = useCallback(async () => {
     if (!uploadedFile || isProcessing) return;
+
     setIsProcessing(true);
     setResults(null);
     setAnalysisStep(1);
 
-    setTimeout(() => {
-      setAnalysisStep(2);
-      setTimeout(() => {
+    const formData = new FormData();
+    formData.append("file", uploadedFile.file);
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/analyze-image", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setResults(data.data);
         setAnalysisStep(3);
-        setTimeout(() => {
-          setIsProcessing(false);
-          setResults({
-            analysis: {
-              mood: "Energetic & Joyful",
-              target_features: {
-                danceability: 0.9,
-                energy: 0.95,
-                valence: 0.85,
-                instrumentalness: 0.05,
-                acousticness: 0.1,
-                speechiness: 0.05,
-              },
-            },
-            match: {
-              name: "Here Comes The Sun",
-              artist: "The Beatles",
-              distance: 0.05,
-              preview_url:
-                "https://p.scdn.co/mp3-preview/a64f5016e15cc6c723f59e7ed22030f0653606b2?cid=23fe1211e4f44c9b9148d4889c0953c8",
-            },
-          });
-        }, 800);
-      }, 800);
-    }, 800);
+      } else {
+        alert("Error: " + data.error);
+      }
+    } catch (err) {
+      alert("Network error: " + err.message);
+    } finally {
+      setIsProcessing(false);
+    }
   }, [uploadedFile, isProcessing]);
 
   const dropZoneClasses = `flex flex-col items-center justify-center border-2 border-dashed rounded-xl h-48 text-center cursor-pointer transition-colors duration-200 
@@ -144,7 +137,13 @@ const App = () => {
     : "bg-purple-600 shadow-lg shadow-purple-900/50 hover:bg-purple-700";
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 font-sans bg-gradient-radial">
+    <div
+      className="flex items-center justify-center min-h-screen p-4 font-sans"
+      style={{
+        background:
+          "radial-gradient(circle at center, #5A2AAC 0%, #3E1C7E 40%, #1E0A3B 100%)",
+      }}
+    >
       <div className="bg-[#2c1f4d]/80 backdrop-blur-sm rounded-2xl p-8 max-w-xl w-full shadow-[0_0_50px_rgba(150,0,255,0.2)] border border-purple-800/50 flex flex-col items-center text-center">
         {/* Header */}
         <div className="flex items-center justify-between w-full mb-6">
@@ -263,9 +262,7 @@ const App = () => {
             </h3>
 
             <div className="mb-6 p-4 bg-purple-900/40 rounded-xl border border-purple-700 shadow-inner">
-              <p className="font-semibold text-gray-200 mb-2">
-                Image Analysis:
-              </p>
+              <p className="font-semibold text-gray-200 mb-2">Image Analysis:</p>
               <p className="text-2xl font-extrabold text-purple-300">
                 Mood: {results.analysis.mood}
               </p>
